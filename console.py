@@ -5,7 +5,6 @@ A module defining the AirBnB console
 import cmd
 from models.base_model import BaseModel
 from models import storage
-import argparse
 
 
 class HBNBCommand(cmd.Cmd):
@@ -13,7 +12,6 @@ class HBNBCommand(cmd.Cmd):
     class defining the command interpreter
     """
     prompt = '(hbnb)'
-    parser = argparse.ArgumentParser()
 
     def do_quit(self, arg):
         """Exit the command interpreter
@@ -52,8 +50,6 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         else:
             print(arg)
-            cls = self.parser.parse_args(arg)
-            print(cls)
             # cls_id = "{:s}.{:s}".format(cls, id)
             # allobjects = storage.all()
             # if cls == 'BaseModel':
