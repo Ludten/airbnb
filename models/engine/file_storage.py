@@ -35,9 +35,7 @@ class FileStorage:
         """
         Serializes objects to the JSON file
         """
-        print(self.__objects)
         objdict = {k: v.to_dict() for k, v in self.__objects.items()}
-        print(objdict)
         with open(self.__file_path, 'w', encoding="utf-8") as f:
             f.write(json.dumps(objdict))
 
@@ -53,6 +51,6 @@ class FileStorage:
                     for k, v in newobject.items():
                         if 'BaseModel' in k:
                             newcls = BaseModel(**v)
-                    self.__objects.update(newcls)
+                        self.__objects[k] = newcls
         except Exception:
             pass
