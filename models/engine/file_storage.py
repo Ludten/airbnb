@@ -3,6 +3,7 @@
 A mdoule for serialization and deserialization of JSON files
 """
 import json
+from models.base_model import BaseModel
 
 
 class FileStorage:
@@ -28,14 +29,17 @@ class FileStorage:
         sets an object id in the objects dictionary
         """
         kid = '{:s}.{:s}'.format(obj.__class__.__name__, obj.id)
-        self.__objects[kid] = obj.to_dict()
+        self.__objects[kid] = obj
 
     def save(self):
         """
         Serializes objects to the JSON file
         """
+        print(self.__objects)
+        objdict = {k: v.to_dict() for k, v in self.__objects.items()}
+        print(objdict)
         with open(self.__file_path, 'w', encoding="utf-8") as f:
-            f.write(json.dumps(self.__objects))
+            f.write(json.dumps(objdict))
 
     def reload(self):
         """
@@ -46,6 +50,9 @@ class FileStorage:
                 s_json = f.read()
                 if s_json != "" and s_json is not None:
                     newobject = json.loads(s_json)
-                    self.__objects.update(newobject)
+                    for k, v in newobject.items():
+                        if 'BaseModel' in k:
+                            newcls = BaseModel(**v)
+                    self.__objects.update(newcls)
         except Exception:
             pass
