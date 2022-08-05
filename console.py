@@ -3,6 +3,7 @@
 A module defining the AirBnB console
 """
 import cmd
+import shlex
 from models.base_model import BaseModel
 from models import storage
 
@@ -49,20 +50,13 @@ class HBNBCommand(cmd.Cmd):
         if arg == '' or arg is None:
             print("** class name missing **")
         else:
-            if '"' in arg:
-                narg = arg.split('"')
-                for i in range(len(narg)):
-                    narg[i] = narg[i].strip()
-                larg = [ele for ele in narg if ele != '']
-            else:
-                larg = arg.split(' ')
+            larg = arg.split(' ')
             try:
                 cls_id = "{:s}.{:s}".format(larg[0], larg[1])
                 allobjects = storage.all()
                 if larg[0] == 'BaseModel':
                     if cls_id in list(allobjects.keys()):
-                        newmodel = BaseModel(allobjects[cls_id])
-                        print(newmodel.__str__())
+                        print(allobjects[cls_id])
                     else:
                         print("** no instance found **")
                 else:
@@ -77,13 +71,7 @@ class HBNBCommand(cmd.Cmd):
         if arg == '' or arg is None:
             print("** class name missing **")
         else:
-            if '"' in arg:
-                narg = arg.split('"')
-                for i in range(len(narg)):
-                    narg[i] = narg[i].strip()
-                larg = [ele for ele in narg if ele != '']
-            else:
-                larg = arg.split(' ')
+            larg = arg.split(' ')
             try:
                 cls_id = "{:s}.{:s}".format(larg[0], larg[1])
                 allobjects = storage.all()
@@ -106,15 +94,12 @@ class HBNBCommand(cmd.Cmd):
         allobjects = storage.all()
         if arg == '':
             for k, v in allobjects.items():
-                if 'BaseModel' in k:
-                    newmodel = BaseModel(v)
-                    print(newmodel.__str__())
+                print(v)
         else:
             if arg == 'BaseModel':
                 for k, v in allobjects.items():
                     if 'BaseModel' in k:
-                        newmodel = BaseModel(v)
-                        print(newmodel.__str__())
+                        print(v)
             else:
                 print("** class doesn't exist **")
 
@@ -122,6 +107,38 @@ class HBNBCommand(cmd.Cmd):
         """update <class name> <id> <attribute name> "<attribute value>"
         Update an attribute of the passes class instance
         """
+        if arg == '' or arg is None:
+            print("** class name missing **")
+        else:
+            if '"' in arg:
+                larg = shlex.split(arg)
+            else:
+                larg = arg.split(' ')
+
+            try:
+                if len(larg) < 4:
+                    print("** value missing **")
+                    return
+                if len(larg) < 3:
+                    print("** attribute name missing **")
+                    return
+                cls_id = "{:s}.{:s}".format(larg[0], larg[1])
+                allobjects = storage.all()
+                if larg[0] == 'BaseModel':
+                    if cls_id in list(allobjects.keys()):
+                        setattr(allobjects[cls_id], larg[2], larg[3])
+                        allobjects[cls_id].save()
+                        storage.save()
+                    else:
+                        print("** no instance found **")
+                else:
+                    print("** class doesn't exist **")
+            except IndexError:
+                print("** instance id missing **")
+
+    def default(self, line):
+
+        return super().default(line)
 
 
 if __name__ == '__main__':
